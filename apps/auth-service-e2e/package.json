@@ -1,10 +1,10 @@
 {
-  "name": "@zshop/auth-service-e2e",
+  "name": "@./auth-service-e2e",
   "version": "0.0.1",
   "private": true,
   "nx": {
     "implicitDependencies": [
-      "@zshop/auth-service"
+      "auth-service"
     ],
     "targets": {
       "e2e": {
@@ -17,8 +17,8 @@
           "passWithNoTests": true
         },
         "dependsOn": [
-          "@zshop/auth-service:build",
-          "@zshop/auth-service:serve"
+          "auth-service:build",
+          "auth-service:serve"
         ]
       }
     }
