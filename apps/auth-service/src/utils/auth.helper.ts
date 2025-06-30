@@ -1,0 +1,91 @@
+import crypto from "crypto";
+import { ValidationError } from "../../../../packages/error-handler";
+import redis from "../../../../packages/libs/redis";
+import { sendEmail } from "./sendMail";
+import { NextFunction } from "express";
+
+// email regex
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const validateRegistrationData = (
+  data: any,
+  userType: "user" | "seller"
+) => {
+  const { name, email, password, phone_number, country } = data;
+
+  if (
+    !name ||
+    !email ||
+    !password ||
+    (userType === "seller" && (!phone_number || !country))
+  ) {
+    throw new ValidationError(`Missing required fields!`);
+  }
+
+  if (!emailRegex.test(email)) {
+    throw new ValidationError("Invalid email format!");
+  }
+};
+
+export const checkOtpRestriction = async (
+  email: string,
+  next: NextFunction
+) => {
+  if (await redis.get(`otp_lock:${email}`)) {
+    return next(
+      new ValidationError(
+        "Account is locked due to multiple failed attempts! Try again after 30 minutes"
+      )
+    );
+  }
+
+  if (await redis.get(`otp_spam_lock:${email}`)) {
+    return next(
+      new ValidationError(
+        "Too many OTP requests! Please wait 1 hour before requesting again."
+      )
+    );
+  }
+
+  if (await redis.get(`otp_cooldown:${email}`)) {
+    return next(
+      new ValidationError("Please wait 1 minute before requesting a new OTP!")
+    );
+  }
+};
+
+export const trackOtpRequests = async (email: string, next: NextFunction) => {
+  const optRequestKey = `otp_request_count:${email}`;
+
+  let otpRequests = parseInt((await redis.get(optRequestKey)) || "0");
+
+  if (otpRequests >= 2) {
+    await redis.set(`otp_spam_lock:${email}`, "locked", "EX", 3600); // lock for 1 hour
+
+    return next(
+      new ValidationError(
+        "Too many OTP requests. please wait 1 hour before requesting again."
+      )
+    );
+  }
+
+  await redis.set(optRequestKey, otpRequests + 1, "EX", 3600); // Tracking request for 1 hour
+};
+
+export const sentOtp = async (
+  name: string,
+  email: string,
+  template: string
+) => {
+  // Generate a random 4-digit OTP code
+  const otp = crypto.randomInt(1000, 9999).toString();
+
+  await sendEmail(email, "Verify Your Email", template, { name, otp });
+
+  // Store the OTP in Redis with a 5-minute expiration
+  await redis.set(`otp:${email}`, otp, "EX", 300);
+
+  // Set a cooldown flag to prevent resending OTP within 60 seconds
+  await redis.set(`otp_cooldown:${email}`, "true", "EX", "60");
+  //
+};
