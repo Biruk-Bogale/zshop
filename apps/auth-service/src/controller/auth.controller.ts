@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import bcrypt from "bcryptjs";
 import {
   checkOtpRestriction,
   sentOtp,
@@ -60,6 +61,17 @@ export const verifyUser = async (
     }
 
     await verifyOtp(email, otp, next);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.users.create({
+      data: { name, email, password: hashedPassword },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+    });
   } catch (error) {
     return next(error);
   }
