@@ -87,7 +87,7 @@ const HeaderBottom = () => {
                   <User />
                 </Link>
 
-                <Link href={"/signin"}>
+                <Link href={"/login"}>
                   <span className="block font-medium">Hello,</span>
 
                   <span className="block font-medium">Sign In</span>
