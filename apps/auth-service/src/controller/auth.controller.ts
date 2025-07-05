@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
   checkOtpRestriction,
+  handleForgotPassword,
   sentOtp,
   trackOtpRequests,
   validateRegistrationData,
@@ -131,4 +132,13 @@ export const loginUser = async (
   } catch (error) {
     return next(error);
   }
+};
+
+// user forgot password
+export const userForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await handleForgotPassword(req, res, next, "user");
 };
