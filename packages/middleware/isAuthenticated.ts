@@ -7,6 +7,7 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
     const token =
       req.cookies.access_token || req.headers.authorization?.split(" ")[1];
 
+    console.log("first");
     if (!token) {
       return res
         .status(401)
@@ -29,14 +30,13 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
       where: { id: decoded.id },
     });
 
+    req.user = account;
+
     if (!account) {
       return res.status(401).json({
         message: "Account not found",
       });
     }
-
-    req.user = account;
-
     return next();
   } catch (error) {
     return res.status(401).json({
