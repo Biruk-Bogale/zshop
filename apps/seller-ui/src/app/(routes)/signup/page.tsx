@@ -2,7 +2,6 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
@@ -19,7 +18,7 @@ type FormData = {
 };
 
 const SignupPage = () => {
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(1);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [canResend, setCanResend] = useState(true);
   const [timer, setTimer] = useState(60);
@@ -29,8 +28,6 @@ const SignupPage = () => {
   const [sellerId, setSellerId] = useState("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const router = useRouter();
 
   const {
     register,

@@ -5,9 +5,10 @@ import jwt from "jsonwebtoken";
 const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
   try {
     const token =
-      req.cookies.access_token || req.headers.authorization?.split(" ")[1];
+      req.cookies["access_token"] ||
+      req.cookies["seller-access_token"] ||
+      req.headers.authorization?.split(" ")[1];
 
-    console.log("first");
     if (!token) {
       return res
         .status(401)
@@ -26,9 +27,22 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
       });
     }
 
-    const account = await prisma.users.findUnique({
-      where: { id: decoded.id },
-    });
+    let account;
+
+    if (decoded.role === "user") {
+      account = await prisma.users.findUnique({
+        where: { id: decoded.id },
+      });
+
+      req.user = account;
+    } else if (decoded.role === "seller") {
+      account = await prisma.sellers.findUnique({
+        where: { id: decoded.id },
+        include: { shop: true },
+      });
+
+      req.seller = account;
+    }
 
     req.user = account;
 
@@ -37,6 +51,9 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
         message: "Account not found",
       });
     }
+
+    req.role = decoded.role;
+
     return next();
   } catch (error) {
     return res.status(401).json({

@@ -120,7 +120,7 @@ const CreateShop = ({
           type="url"
           placeholder="http://example.com"
           className="w-full p-2 border border-gray-300 outline-0 rounded-md mb-1"
-          {...register("webiste", {
+          {...register("website", {
             pattern: {
               value: /^(https?:\/\/)?([\w\d-]+\.)+\w{2,}(\/.*)?$/,
               message: "Enter a valid URL",
@@ -128,9 +128,9 @@ const CreateShop = ({
           })}
         />
 
-        {errors.webiste && (
+        {errors.website && (
           <p className="text-red-500 text-sm">
-            {String(errors.webiste.message)}
+            {String(errors.website.message)}
           </p>
         )}
 
