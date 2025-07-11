@@ -3,10 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
-});
-
 import {
   checkOtpRestriction,
   handleForgotPassword,
@@ -19,6 +15,10 @@ import {
 import prisma from "@packages/libs/primsa";
 import { AuthError, ValidationError } from "@packages/error-handler";
 import { setCookie } from "../utils/cookies/setCookie";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-06-30.basil",
+});
 
 // register a new user
 export const userRegistration = async (
@@ -111,6 +111,9 @@ export const loginUser = async (
       return next(new AuthError("Invalid email or password"));
     }
 
+    res.clearCookie("seller-access-token");
+    res.clearCookie("seller-refresh-token");
+
     // Generate access and refresh token
     const accessToken = jwt.sign(
       { id: user.id, role: "user" },
@@ -141,14 +144,17 @@ export const loginUser = async (
   }
 };
 
-// refresh token user
+// refresh token
 export const refreshToken = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refresh_token;
+    const refreshToken =
+      req.cookies["refresh_token"] ||
+      req.cookies["seller-refresh-token"] ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!refreshToken) {
       return new ValidationError("Unauthorized! No refresh token.");
@@ -163,13 +169,18 @@ export const refreshToken = async (
       return new JsonWebTokenError("Forbidden! Invalid refresh token.");
     }
 
-    // let account;
-    // if (decoded.role === "user") {
-    // }
+    let account;
 
-    const user = await prisma.users.findUnique({ where: { id: decoded.id } });
+    if (decoded.role === "user") {
+      account = await prisma.users.findUnique({ where: { id: decoded.id } });
+    } else if (decoded.role === "seller") {
+      account = await prisma.sellers.findUnique({
+        where: { id: decoded.id },
+        include: { shop: true },
+      });
+    }
 
-    if (!user) {
+    if (!account) {
       return new AuthError("Forbidden! User/Seller not found");
     }
 
@@ -181,7 +192,13 @@ export const refreshToken = async (
       }
     );
 
-    setCookie(res, "access_token", newAccessToken);
+    if (decoded.role === "user") {
+      setCookie(res, "access_token", newAccessToken);
+    } else if (decoded.role === "seller") {
+      setCookie(res, "seller-access-token", newAccessToken);
+    }
+
+    req.role = decoded.role;
 
     return res.status(201).json({ success: true });
   } catch (error) {
@@ -459,6 +476,10 @@ export const loginSeller = async (
       return next(new ValidationError("Invalid email or password"));
     }
 
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+
+    // generate access abd refresh token
     const accessToken = jwt.sign(
       { id: seller.id, role: "seller" },
       process.env.ACCESS_TOKEN_SECRET as string,

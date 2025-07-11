@@ -26,16 +26,20 @@ app.set("trust proxy", 1);
 // apply rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: (req: any) => (req.user ? 1000 : 100),
+  max: (req: any) => {
+    return req.cookies["seller-access-token"] || req.cookies["access_token"]
+      ? 1000
+      : 100;
+  },
   message: { error: "Too many request, please try again later" },
   standardHeaders: true,
   legacyHeaders: true,
-  keyGenerator: (req: any) => req.ip,
+  // keyGenerator: (req: any) => req.ip,
 });
 
 app.use(limiter);
 
-app.get("/gatway-health", (req, res) => {
+app.get("/gateway-health", (req, res) => {
   res.send({ message: "Welcome to api-gateway!" });
 });
 
