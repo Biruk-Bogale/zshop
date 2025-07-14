@@ -3,7 +3,7 @@ const swaggerAutogen = require("swagger-autogen");
 
 const doc = {
   info: {
-    title: "Auto Service Api",
+    title: "Auth Service Api",
     description: "Automatically generated Swagger docs",
     version: "1.0.0",
   },

@@ -7,14 +7,13 @@ import useSeller from "../../../hooks/useSeller";
 import Box from "../box";
 import { Sidebar } from "./sidebar.styles";
 import Link from "next/link";
-import Logo from "apps/seller-ui/src/assets/svgs/logo";
+// import Logo from "apps/seller-ui/src/assets/svgs/logo";
 import SidebarItem from "./sidebar.item";
 import {
   BellPlus,
   BellRing,
   CalendarPlus,
   CreditCard,
-  Home,
   LayoutDashboard,
   ListOrdered,
   LogOut,
