@@ -55,6 +55,7 @@ const CustomSpecifications = ({ control, errors }: any) => {
         ))}
 
         <button
+          type="button"
           className="flex items-center gap-2 text-blue-500 hover:text-blue-600"
           onClick={() => append({ name: "", value: "" })}
         >
