@@ -9,6 +9,9 @@ interface ImagePlaceHolderProps {
   onRemove?: (index: number) => void;
   defaultImage?: string | null;
   setOpenImageModal: (openImageModal: boolean) => void;
+  setSelectedImage: (e: string) => void;
+  images: any;
+  pictureUploadingLoader: boolean;
   index: any;
 }
 
@@ -19,6 +22,9 @@ const ImagePlaceHolder = ({
   onRemove,
   defaultImage = null,
   index = null,
+  setSelectedImage,
+  images,
+  pictureUploadingLoader,
   setOpenImageModal,
 }: ImagePlaceHolderProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultImage);
@@ -50,6 +56,7 @@ const ImagePlaceHolder = ({
         <>
           <button
             type="button"
+            disabled={pictureUploadingLoader}
             onClick={() => onRemove?.(index!)}
             className="absolute top-3 right-3 p-2 !rounded bg-red-600 shadow-lg"
           >
@@ -58,7 +65,11 @@ const ImagePlaceHolder = ({
 
           <button
             className="absolute top-3 right-[70px] p-2 !rounded bg-orange-500 shadow-lg cursor-pointer"
-            onClick={() => setOpenImageModal(true)}
+            disabled={pictureUploadingLoader}
+            onClick={() => {
+              setOpenImageModal(true);
+              setSelectedImage(images[index].file_url);
+            }}
           >
             <WandSparkles size={16} />
           </button>

@@ -16,7 +16,10 @@ app.use(
   })
 );
 
-app.use(express.json());
+// ✅ Increase request body size limits
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: true, limit: "100mb" }));
+
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
