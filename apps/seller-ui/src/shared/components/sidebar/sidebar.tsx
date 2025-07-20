@@ -132,16 +132,16 @@ const SideBarWrapper = () => {
               />
 
               <SidebarItem
-                isActive={activeSidebar === "/dashboard/all-product"}
+                isActive={activeSidebar === "/dashboard/all-products"}
                 title="All Product"
                 icon={
                   <PackageSearch
                     strokeWidth={2}
                     size={22}
-                    fill={getIconColor("/dashboard/all-product")}
+                    fill={getIconColor("/dashboard/all-products")}
                   />
                 }
-                href="/dashboard/all-product"
+                href="/dashboard/all-products"
               />
             </SidebarMenu>
 
