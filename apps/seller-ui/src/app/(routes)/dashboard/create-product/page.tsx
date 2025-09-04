@@ -81,7 +81,7 @@ const CreateProduct = () => {
   // console.log(categories, subCategories);
 
   const onSubmit = async (data: any) => {
-    console.log("first")
+    console.log("first");
     try {
       setLoading(true);
       await axiosInstance.post("/product/api/create-product", data);
@@ -181,6 +181,8 @@ const CreateProduct = () => {
   };
 
   const handleDraft = () => {};
+
+  console.log(errors);
 
   return (
     <form

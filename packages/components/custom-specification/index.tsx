@@ -65,7 +65,8 @@ const CustomSpecifications = ({ control, errors }: any) => {
 
       {errors.custom_specification && (
         <p className="text-red-500 text-xs mt-1">
-          {errors.custom_specification.message as string}
+          {errors.custom_specification[0].name.message as string}{", "}
+          {errors.custom_specification[0].value.message as string}
         </p>
       )}
     </div>
