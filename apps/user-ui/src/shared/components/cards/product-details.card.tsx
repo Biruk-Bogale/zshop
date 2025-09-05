@@ -7,6 +7,10 @@ import Ratings from "../ratings";
 import { Heart, MapPin, MessageCircle, ShoppingCart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Span } from "next/dist/trace";
+import useUser from "apps/user-ui/src/hooks/useUser";
+import useLocationTracking from "apps/user-ui/src/hooks/useLocationTracking";
+import useDeviceTracking from "apps/user-ui/src/hooks/useDeviceTracking";
+import { useStore } from "apps/user-ui/src/store";
 
 const ProductDetailsCard = ({
   data,
@@ -20,6 +24,22 @@ const ProductDetailsCard = ({
   const [isSizeSelected, setIsSizeSelected] = useState(data?.sizes?.[0] || "");
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
+
+  const { user } = useUser();
+  const location = useLocationTracking();
+  const deviceInfo = useDeviceTracking();
+
+  const addToCart = useStore((state: any) => state.addToCart);
+  const removeFromCart = useStore((state: any) => state.removeFromCart);
+
+  const addToWishlist = useStore((state: any) => state.addToWishlist);
+  const removeFromWishlist = useStore((state: any) => state.removeFromWishlist);
+
+  const wishlist = useStore((state: any) => state.wishlist);
+  const isWishlisted = wishlist.some((item: any) => item?.id === data?.id);
+
+  const cart = useStore((state: any) => state.cart);
+  const isInCart = cart.some((item: any) => item?.id === data?.id);
 
   const estimatedDelivery = new Date();
   estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
@@ -207,12 +227,39 @@ const ProductDetailsCard = ({
                 </button>
               </div>
               <button
-                className={`flex items-center gap-2 px-2 py-2 bg-[#ff5722] hover:bg-[#e64a19] text-white font-medium rounded-lg transition`}
+                className={`flex items-center gap-2 px-2 py-2 bg-[#ff5722] hover:bg-[#e64a19] text-white font-medium rounded-lg transition ${
+                  isInCart ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+                disabled={isInCart}
+                onClick={() =>
+                  !isInCart &&
+                  addToCart(
+                    { ...data, quantity: 1 },
+                    user,
+                    location,
+                    deviceInfo
+                  )
+                }
               >
                 <ShoppingCart size={18} /> Add to Cart
               </button>
               <button className="opacity-[.7] cursor-pointer">
-                <Heart size={30} fill="red" color="transparent" />
+                <Heart
+                  className="cursor-pointer hover:scale-110 transition"
+                  size={22}
+                  fill={isWishlisted ? "red" : "transparent"}
+                  stroke={isWishlisted ? "red" : "#4B5563"}
+                  onClick={() => {
+                    isWishlisted
+                      ? removeFromWishlist(data.id, user, location, deviceInfo)
+                      : addToWishlist(
+                          { ...data, quantity: 1 },
+                          user,
+                          location,
+                          deviceInfo
+                        );
+                  }}
+                />
               </button>
             </div>
 

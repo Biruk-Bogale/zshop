@@ -451,8 +451,6 @@ export const getAllProducts = async (
       }),
     ]);
 
-    console.log(products);
-
     res.status(200).json({
       products,
       top10By: type === "latest" ? "latest" : "topSales",
