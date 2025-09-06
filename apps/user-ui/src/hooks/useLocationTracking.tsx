@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 const LOCATION_STORAGE_KEY = "user_location";
 const LOCATION_EXPIRY_DAYS = 20;
 
-const getStoredLocaion = () => {
-  const storedData = localStorage.getItem(LOCATION_STORAGE_KEY);
+const getStoredLocation = () => {
+  if (typeof window === "undefined") return null; // ✅ prevent SSR crash
 
+  const storedData = localStorage.getItem(LOCATION_STORAGE_KEY);
   if (!storedData) return null;
 
   const parsedData = JSON.parse(storedData);
-  const expiryTime = LOCATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000; //20 days
+  const expiryTime = LOCATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
   const isExpired = Date.now() - parsedData.timestamp > expiryTime;
 
   return isExpired ? null : parsedData;
@@ -21,10 +22,14 @@ const useLocationTracking = () => {
   const [location, setLocation] = useState<{
     country: string;
     city: string;
-  } | null>(getStoredLocaion());
+  } | null>(null);
 
   useEffect(() => {
-    if (location) return;
+    const stored = getStoredLocation();
+    if (stored) {
+      setLocation(stored);
+      return;
+    }
 
     fetch("http://ip-api.com/json/")
       .then((res) => res.json())
@@ -38,7 +43,7 @@ const useLocationTracking = () => {
         localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(newLocation));
         setLocation(newLocation);
       })
-      .catch((error) => console.log("Failed to getlocation", error));
+      .catch((error) => console.log("Failed to get location", error));
   }, []);
 
   return location;
