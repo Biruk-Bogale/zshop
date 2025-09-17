@@ -16,6 +16,7 @@ const ProductCard = ({
   product: any;
   isEvent?: boolean;
 }) => {
+  console.log(product);
   const [timeLeft, setTimeLeft] = useState("");
   const [open, setOpen] = useState(false);
   const { user } = useUser();
@@ -72,7 +73,7 @@ const ProductCard = ({
         </div>
       )}
 
-      <Link href={`/products/${product?.slug}`}>
+      <Link href={`/product/${product?.slug}`}>
         <img
           src={
             product?.images[0]?.url ||

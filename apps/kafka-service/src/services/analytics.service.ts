@@ -2,7 +2,6 @@ import prisma from "@packages/libs/primsa";
 
 export const updateUserAnalytics = async (event: any) => {
   try {
-    console.log(event);
     const existingData = await prisma.userAnalytics.findUnique({
       where: {
         userId: event.userId,
@@ -20,8 +19,8 @@ export const updateUserAnalytics = async (event: any) => {
     // always store `product_view` for recommendations
     if (event.action === "product_view") {
       updatedActions.push({
-        productId: event?.productId,
-        shopId: event?.shopId,
+        productId: event?.productId ?? "",
+        shopId: event?.shopId ?? "",
         action: event?.action,
         timestamp: new Date(),
       });

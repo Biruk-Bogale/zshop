@@ -14,15 +14,12 @@ export async function sendKafkaEvent(eventData: {
   city?: string;
 }) {
   try {
-    console.log(eventData);
     await producer.connect();
 
-    const a = await producer.send({
+    await producer.send({
       topic: "users-events",
       messages: [{ value: JSON.stringify(eventData) }],
     });
-
-    console.log(a);
   } catch (error) {
     console.log(error);
   } finally {

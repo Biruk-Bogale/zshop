@@ -30,6 +30,7 @@ model users {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   shopReviews             shopReviews[]
+  followers               followers[] @relation("shopFollowers")
   userAnalytics           userAnalytics[] @relation("userAnalyticsUser")
 }
 
@@ -45,6 +46,16 @@ model shopReviews {
   shops                   shops? @relation(fields: [shopsId],references: [id])
 }
 
+
+model followers {
+  id                    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String @db.ObjectId
+  user                  users @relation("shopFollowers",fields: [userId],references: [id])
+
+  shopsId                 String? @db.ObjectId
+  shops                   shops? @relation("shopFollowerRelation",fields: [shopsId],references: [id])
+}
+
 model shops {
   id                      String @id @default(auto()) @map("_id") @db.ObjectId
   name                    String
@@ -58,6 +69,7 @@ model shops {
   socialLinks             Json[]
   ratings                 Float @default(0)
   reviews                 shopReviews[]
+  followers               followers[] @relation("shopFollowerRelation")
   sellerId                String @unique @db.ObjectId
   sellers                 sellers @relation(fields: [sellerId],references: [id])
   createdAt               DateTime @default(now())
@@ -65,6 +77,7 @@ model shops {
   products                products[]
 
   productAnalytics        productAnalytics[] @relation("productAnalyticsShop")
+  orders                  orders[] @relation("orderAnalyticsShop")
 }
 
 model sellers {
@@ -186,4 +199,13 @@ model productAnalytics {
     lastViewedAt         DateTime @updatedAt
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
+}
+
+model orders {
+    id                   String @id @default(auto()) @map("_id") @db.ObjectId
+    
+    shopId               String  @db.ObjectId  @unique 
+    shop                 shops @relation("orderAnalyticsShop",fields: [shopId],references: [id])
+
+    total                Int 
 }

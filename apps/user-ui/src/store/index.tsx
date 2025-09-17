@@ -63,8 +63,10 @@ export const useStore = create<Store>()(
                   : item
               ),
             };
-          }
-          return { cart: [...state.cart, { ...product, quantity: 1 }] };
+          }     
+          return {
+            cart: [...state.cart, { ...product, quantity: product?.quantity }],
+          };
         });
 
         //send kafka event
@@ -91,7 +93,6 @@ export const useStore = create<Store>()(
         }));
         //send kafka event
         if (user?.id && location && deviceInfo && removeProduct) {
-          console.log(user?.id);
           sendKafkaEvent({
             userId: user?.id,
             productId: removeProduct?.id,
