@@ -12,7 +12,7 @@ const MIN = 0;
 const MAX = 1199;
 
 const Page = () => {
-  const [isProductLoading, setIsProductLoading] = useState(false);
+  const [isProductLoading, setIsProductLoading] = useState(true);
   const [priceRange, setPriceRange] = useState([0, 1199]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);

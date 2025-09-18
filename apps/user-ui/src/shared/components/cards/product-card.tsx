@@ -62,7 +62,7 @@ const ProductCard = ({
   return (
     <div className="w-full min-h-[350px] h-max bg-white rounded-lg relative">
       {isEvent && (
-        <div className="absolute top-2 bg-red-600 text-white text-[10px] font-semibold px-2 py-1 rounded-sm shadow-md">
+        <div className="z-50 absolute top-2 bg-red-600 text-white text-[10px] font-semibold px-2 py-1 rounded-sm shadow-md">
           OFFER
         </div>
       )}
