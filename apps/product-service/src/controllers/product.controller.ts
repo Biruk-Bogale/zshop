@@ -464,6 +464,68 @@ export const getAllProducts = async (
   }
 };
 
+// get all events
+export const getAllEvents = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const skip = (page - 1) * limit;
+
+    const baseFilter = {
+      AND: [
+        {
+          starting_date: { not: null },
+        },
+        {
+          ending_date: { not: null },
+        },
+      ],
+    };
+
+    const [events, total, top10BySales] = await Promise.all([
+      ///////
+      prisma.products.findMany({
+        skip,
+        take: limit,
+        // where: baseFilter,
+        include: {
+          images: true,
+          Shops: true,
+        },
+        orderBy: {
+          totalSales: "desc",
+        },
+      }),
+
+      ///////////
+      prisma.products.count({ where: baseFilter }),
+
+      ///////////
+      prisma.products.findMany({
+        take: 10,
+        where: baseFilter,
+        orderBy: { totalSales: "desc" },
+      }),
+    ]);
+
+    res.status(200).json({
+      events,
+      top10BySales,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // get product details
 export const getProductDetails = async (
   req: any,
@@ -801,7 +863,7 @@ export const topShops = async (req: any, res: Response, next: NextFunction) => {
         category: true,
       },
     });
-
+    console.log(shops);
     // merge sales with shop data
     const enrichedShops = shops.map((shop) => {
       const salesData = topShopsData.find((s) => s.shopId === shop.id);
