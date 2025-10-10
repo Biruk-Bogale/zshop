@@ -12,26 +12,30 @@ model images {
   id                      String @id @default(auto()) @map("_id") @db.ObjectId
   file_id                 String
   url                     String 
-  userId                  String? @unique @db.ObjectId 
-  shopId                  String? @unique @db.ObjectId
-  users                   users? @relation(fields: [userId],references: [id])
-  shops                   shops? @relation(fields: [shopId],references: [id])
-  products                products? @relation(fields: [productsId],references: [id])
+  
+  userId                  String? @db.ObjectId 
+  shopId                  String? @db.ObjectId
   productsId              String? @db.ObjectId
+
+  users                   users?
+  // shops                   shops?
+  products                products? @relation(fields: [productsId],references: [id])
 }
 
 model users {
   id                      String @id @default(auto()) @map("_id") @db.ObjectId
   name                    String
   email                   String @unique
+  role                    String @default("user")
   password                String?
   following               String[]
-  avatar                  images?
+  avatar                  images?  @relation(fields: [imagesId], references: [id])
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   shopReviews             shopReviews[]
-  followers               followers[] @relation("shopFollowers")
-  userAnalytics           userAnalytics[] @relation("userAnalyticsUser")
+  imagesId                String?  @db.ObjectId @unique
+  followers               followers[]
+  orders                  orders[]
 }
 
 model shopReviews {
@@ -50,10 +54,12 @@ model shopReviews {
 model followers {
   id                    String @id @default(auto()) @map("_id") @db.ObjectId
   userId                String @db.ObjectId
-  user                  users @relation("shopFollowers",fields: [userId],references: [id])
+  shopsId               String? @db.ObjectId
 
-  shopsId                 String? @db.ObjectId
-  shops                   shops? @relation("shopFollowerRelation",fields: [shopsId],references: [id])
+  user                  users @relation(fields: [userId],references: [id])
+  shops                 shops? @relation(fields: [shopsId],references: [id])
+
+  @@unique([userId,shopsId]) // one user can follow the same shop only once
 }
 
 model shops {
@@ -61,7 +67,8 @@ model shops {
   name                    String
   bio                     String?
   category                String
-  avatar                  images?
+  avatar                  String?
+  imagesId                String?  @db.ObjectId @unique
   coverBanner             String?
   address                 String
   opening_hours           String
@@ -69,15 +76,15 @@ model shops {
   socialLinks             Json[]
   ratings                 Float @default(0)
   reviews                 shopReviews[]
-  followers               followers[] @relation("shopFollowerRelation")
+  followers               followers[]
   sellerId                String @unique @db.ObjectId
   sellers                 sellers @relation(fields: [sellerId],references: [id])
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   products                products[]
-
-  productAnalytics        productAnalytics[] @relation("productAnalyticsShop")
-  orders                  orders[] @relation("orderAnalyticsShop")
+  isDeleted               Boolean @default(false)
+  deletedAt               DateTime?
+  orders                  orders[]
 }
 
 model sellers {
@@ -91,12 +98,16 @@ model sellers {
   shop                    shops?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
+  isDeleted               Boolean @default(false)
+  deletedAt               DateTime?
 }
 
 model site_configs {
   id                      String @id @default(auto()) @map("_id") @db.ObjectId
   categories              String[]
   subCategories           Json
+  logo                    String?
+  banner                  String?
 }
 
 model discount_codes {
@@ -133,7 +144,6 @@ model products {
   starting_date           DateTime?
   ending_date             DateTime?
   stock                   Int
-  totalSales              Int?
   sales_price             Float
   regular_price           Float
   rating                  Float @default(5)
@@ -144,14 +154,12 @@ model products {
   cashOnDelivery          String?
   discount_codes          String[] @db.ObjectId
   status                  productStatus @default(Active)
+  totalSales              Int? @default(0)
   deletedAt               DateTime?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   shopId                  String @db.ObjectId
   Shops                   shops @relation(fields: [shopId],references: [id])
-
-  userAnalytics           userAnalytics[] @relation("userAnalyticsProduct")
-  productAnalytics        productAnalytics[] @relation("productAnalyticsProduct")
 }
 
 // Define the embedded type for actions
@@ -164,48 +172,112 @@ type Action {
 
 model userAnalytics {
     id                    String @id @default(auto()) @map("_id") @db.ObjectId
-    lastVisited           DateTime @updatedAt
-    lastTrained           DateTime @updatedAt
-    createdAt             DateTime @default(now())
-    updatedAt             DateTime @updatedAt
-
+    userId               String  @db.ObjectId  @unique 
     country               String?
     city                  String?
     device                String?
-    
-    actions               Action[]      // embedded array of objects
-
-    productId             String? @db.ObjectId  @unique 
-    products              products? @relation("userAnalyticsProduct",fields: [productId],references: [id])
-
-    userId               String  @db.ObjectId  @unique 
-    user                 users @relation("userAnalyticsUser",fields: [userId],references: [id])
+    lastVisited           DateTime @updatedAt
+    // actions               Action[]      // embedded array of objects
+    actions               Json?      // embedded array of objects
+    recommendations       Json?
+    lastTrained           DateTime @updatedAt
+    createdAt             DateTime @default(now())
+    updatedAt             DateTime @updatedAt
 }
 
 model productAnalytics {
     id                    String @id @default(auto()) @map("_id") @db.ObjectId
-    
-    productId             String? @db.ObjectId  @unique 
-    products              products? @relation("productAnalyticsProduct",fields: [productId],references: [id])
+    productId             String? @unique 
+    shopId                String   @unique 
+    views                 Int @default(0)
+    cartAdds              Int @default(0)
+    wishlistAdds          Int @default(0)
+    purchases             Int @default(0)
+    lastViewedAt          DateTime
 
-    shopId               String  @db.ObjectId  @unique 
-    shop                 shops @relation("productAnalyticsShop",fields: [shopId],references: [id])
-
-    views                Int
-    cartAdds             Int
-    wishlistAdds         Int
-    purchases            Int
-
-    lastViewedAt         DateTime @updatedAt
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 }
 
+model shopAnalytics {
+    id                    String @id @default(auto()) @map("_id") @db.ObjectId
+    totalVisitors         Int @default(0)
+
+    countryStats          Json? //store aggregated country data {"US":20."ET":58,"UK":15}
+    cityStats             Json? //store aggregated city data {"New York":12."Addis Ababa":43,}
+    DeviceStats           Json? //store aggregated device data {"Mobile":42."Desktop":17,}
+    
+    lastViewedAt          DateTime
+
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model uniqueShopVisitors {
+    id                    String @id @default(auto()) @map("_id") @db.ObjectId
+    shopId                String   @db.ObjectId
+    userId                String   @db.ObjectId
+    visitedAt             DateTime @default(now())
+
+    @@unique([shopId,userId])
+}
+
 model orders {
     id                   String @id @default(auto()) @map("_id") @db.ObjectId
-    
-    shopId               String  @db.ObjectId  @unique 
-    shop                 shops @relation("orderAnalyticsShop",fields: [shopId],references: [id])
+    userId               String @db.ObjectId
+    user                 users @relation(fields: [userId],references: [id])
+    shopId               String  @db.ObjectId
+    shop                 shops @relation(fields: [shopId],references: [id])
+    total                Float
+    shippingAddressId    String?
+    couponCode           String?
+    discountAmount       Float?
+    status               String
+    deliveryStatus       String @default("Ordered")
+    items                orderItems[] @relation("OrderItemsRelation")
 
-    total                Int 
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model orderItems {
+    id                   String @id @default(auto()) @map("_id") @db.ObjectId
+    orderId              String @db.ObjectId
+    productId            String
+    quantity             Int
+    price                Float
+    selectedOptions      Json?
+
+    orders               orders @relation(fields: [orderId],references: [id],name: "OrderItemsRelation")
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+enum addressType {
+  Home
+  Work
+  Other
+}
+
+model address {
+    id                   String @id @default(auto()) @map("_id") @db.ObjectId
+    userId               String  @db.ObjectId  
+    label                 String
+    name                  String
+    street                String
+    city                  String
+    zip                   String
+    country               String
+    isDefault             Boolean @default(false)    
+
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model notifications {
+    id                   String @id @default(auto()) @map("_id") @db.ObjectId
+    creatorId            String @db.ObjectId
+    receiverId           String
+    redirect_link        String?
+    title                String
 }

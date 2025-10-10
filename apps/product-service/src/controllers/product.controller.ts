@@ -192,7 +192,7 @@ export const createProduct = async (
       category,
       colors = [],
       sizes = [],
-      discountCodes,
+      discountCodes = [],
       stock,
       sale_price,
       regular_price,
