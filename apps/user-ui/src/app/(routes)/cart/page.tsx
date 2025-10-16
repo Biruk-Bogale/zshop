@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 const CartPage = () => {
   const { user } = useUser();
@@ -293,14 +293,12 @@ const CartPage = () => {
                   />
                   <button
                     className="bg-orange-500 cursor-pointer text-white px-4 rounded-r-md hover:bg-orange-600 transition-all"
-                    onClick={() => couponCodeApplyHandler}
+                    onClick={() => couponCodeApplyHandler()}
                   >
                     Apply
                   </button>
                 </div>
-                  {error && (
-                    <p className="text-sm pt-2 text-red-500">{error}</p>
-                  )}
+                {error && <p className="text-sm pt-2 text-red-500">{error}</p>}
                 <hr className="mt-4 text-slate-200" />
 
                 <div className="mb-4">

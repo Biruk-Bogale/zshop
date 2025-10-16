@@ -12,6 +12,7 @@ import {
   refreshToken,
   registerSeller,
   resetUserPassword,
+  updateUserPassword,
   userForgotPassword,
   userRegistration,
   verifySeller,
@@ -40,5 +41,6 @@ router.get("/logged-in-seller", isAuthenticated, isSeller, getSeller);
 router.get("/shipping-addresses", isAuthenticated, getUserAddress);
 router.post("/add-address", isAuthenticated, addUserAddress);
 router.delete("/delete-address/:addressId", isAuthenticated, deleteUserAddress);
+router.post("/change-password", isAuthenticated, updateUserPassword);
 
 export default router;
