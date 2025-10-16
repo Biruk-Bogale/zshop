@@ -6,6 +6,7 @@ import {
   getOrdersDetails,
   getSellerOrders,
   updateDeliveryStatus,
+  verifyCouponCode,
   verifyPayementSession,
 } from "../controllers/order.controller";
 import { isSeller } from "@packages/middleware/authorizeRoles";
@@ -27,5 +28,6 @@ router.put(
   isSeller,
   updateDeliveryStatus
 );
+router.put("/verify-coupon", isAuthenticated, verifyCouponCode);
 
 export default router;
