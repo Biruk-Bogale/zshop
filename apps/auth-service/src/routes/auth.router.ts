@@ -7,6 +7,7 @@ import {
   getSeller,
   getUser,
   getUserAddress,
+  loginAdmin,
   loginSeller,
   loginUser,
   refreshToken,
@@ -37,6 +38,7 @@ router.post("/verify-seller", verifySeller);
 router.post("/create-shop", createShop);
 router.post("/create-stripe-link", createStripeConnectLink);
 router.post("/login-seller", loginSeller);
+router.post("/login-admin", loginAdmin);
 router.get("/logged-in-seller", isAuthenticated, isSeller, getSeller);
 router.get("/shipping-addresses", isAuthenticated, getUserAddress);
 router.post("/add-address", isAuthenticated, addUserAddress);
