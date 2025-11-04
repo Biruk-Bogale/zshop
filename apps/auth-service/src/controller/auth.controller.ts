@@ -772,3 +772,17 @@ export const loginAdmin = async (
     return next(error);
   }
 };
+
+// get logged in admin
+export const getAdmin = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    const admin = req.admin;
+
+    res.status(201).json({
+      success: true,
+      admin,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

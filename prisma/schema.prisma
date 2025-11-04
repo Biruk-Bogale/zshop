@@ -13,11 +13,11 @@ model images {
   file_id                 String
   url                     String 
   
-  userId                  String? @db.ObjectId 
+  userId                  String? @db.ObjectId
   shopId                  String? @db.ObjectId
   productsId              String? @db.ObjectId
 
-  users                   users?
+  users                   users?  @relation(fields: [userId], references: [id])
   // shops                   shops?
   products                products? @relation(fields: [productsId],references: [id])
 }
@@ -29,11 +29,11 @@ model users {
   role                    String @default("user")
   password                String?
   following               String[]
-  avatar                  images?  @relation(fields: [imagesId], references: [id])
+  avatar                  images[]
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   shopReviews             shopReviews[]
-  imagesId                String?  @db.ObjectId @unique
+  imagesId                String?  @db.ObjectId
   followers               followers[]
   orders                  orders[]
 }
@@ -281,4 +281,8 @@ model notifications {
     redirect_link        String?
     title                String
     message              String
+    status               String @default("Unread")
+
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
 }

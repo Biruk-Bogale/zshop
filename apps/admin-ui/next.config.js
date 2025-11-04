@@ -12,6 +12,13 @@ const nextConfig = {
   nx: {
     svgr: false,
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "ik.imagekit.io",
+      },
+    ],
+  },
 };
 
 const plugins = [

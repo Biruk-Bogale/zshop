@@ -25,11 +25,12 @@ const initialzeSiteConfig = async () => {
               "Wearables",
             ],
           },
+          logo: "https://ik.imagekit.io/siisbrnjd/logo/jahshjjas%hna&andkjksdb",
+          banner:
+            "https://ik.imagekit.io/siisbrnjd/logo/jahshjjas%hna&andkjksdb",
         },
       });
     }
-
-    
   } catch (error) {
     console.error("Error initializing site config:", error);
   }
