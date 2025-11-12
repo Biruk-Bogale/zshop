@@ -1,0 +1,29 @@
+{
+  "name": "@zshop/logger-service",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@zshop/logger-service:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@zshop/logger-service:build:development"
+          },
+          "production": {
+            "buildTarget": "@zshop/logger-service:build:production"
+          }
+        }
+      }
+    }
+  }
+}
