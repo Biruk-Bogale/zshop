@@ -26,7 +26,7 @@ const OrdersTable = () => {
     {
       accessorKey: "id",
       header: "Order ID",
-      cell: ({ info }: any) => info?.getValue()?.slice(-6),
+      cell: ({ row }) => <>{row.original?.id?.slice(-6)}</>,
     },
     {
       accessorKey: "status",
@@ -35,12 +35,16 @@ const OrdersTable = () => {
     {
       accessorKey: "total",
       header: "Total ($)",
-      cell: ({ info }: any) => `$${info?.getValue()?.toFixed(2)}`,
+
+      cell: ({ row }) => <>${row.original?.total?.toFixed(2)}</>,
     },
+
     {
       accessorKey: "createdAt",
       header: "Date",
-      cell: ({ info }: any) => new Date(info?.getValue())?.toLocaleDateString(),
+      cell: ({ row }) => (
+        <>{new Date(row.original?.createdAt)?.toLocaleDateString()}</>
+      ),
     },
     {
       accessorKey: "actions",
@@ -93,7 +97,7 @@ const OrdersTable = () => {
           {table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="border-b border-b-gray-200 hover:bg-gray-50"
+              className="border-b border-b-gray-200 hover:bg-gray-50 text-gray-800"
             >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="py-2 px-3">

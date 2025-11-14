@@ -22,6 +22,8 @@ import ReactImageMagnify from "react-image-magnify";
 import Ratings from "../../components/ratings";
 import Link from "next/link";
 import ProductCard from "../../components/cards/product-card";
+import { isProtected } from "apps/user-ui/src/utils/protected";
+import { useRouter } from "next/navigation";
 
 const ProductDetails = ({ productDetails }: { productDetails: any }) => {
   const { user, isLoading } = useUser();
@@ -43,6 +45,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
     productDetails?.sales_price,
     1199,
   ]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const addToCart = useStore((state: any) => state.addToCart);
   const removeFromCart = useStore((state: any) => state.removeFromCart);
@@ -54,6 +57,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
   const isWishlisted = wishlist.some(
     (item: any) => item?.id === productDetails?.id
   );
+  const router = useRouter();
 
   //   navigate to previous image
   const prevImage = () => {
@@ -115,6 +119,27 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
       productDetails?.regular_price) *
       100
   );
+
+  const handleChat = async () => {
+    if (isChatLoading) {
+      return;
+    }
+    setIsChatLoading(true);
+
+    try {
+      const res = await axiosInstance.post(
+        "/chatting/api/create-user-conversationGroup",
+        { sellerId: productDetails?.Shops?.sellerId },
+        isProtected
+      );
+
+      router.push(`/inbox?conversationId=${res.data.conversation.id}`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
 
   return (
     <div className="w-full bg-[#f5f5f5] py-5">
@@ -414,6 +439,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
               </div>
 
               <Link
+              onClick={()=>handleChat()}
                 href={"#"}
                 className="text-blue-500 text-sm flex items-center gap-1"
               >
