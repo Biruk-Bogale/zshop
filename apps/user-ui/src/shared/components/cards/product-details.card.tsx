@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import Ratings from "../ratings";
 import { Heart, MapPin, MessageCircle, ShoppingCart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Span } from "next/dist/trace";
+// import { Span } from "next/dist/trace";
 import useUser from "apps/user-ui/src/hooks/useUser";
 import useLocationTracking from "apps/user-ui/src/hooks/useLocationTracking";
 import useDeviceTracking from "apps/user-ui/src/hooks/useDeviceTracking";
@@ -33,7 +33,7 @@ const ProductDetailsCard = ({
   const deviceInfo = useDeviceTracking();
 
   const addToCart = useStore((state: any) => state.addToCart);
-  const removeFromCart = useStore((state: any) => state.removeFromCart);
+  // const removeFromCart = useStore((state: any) => state.removeFromCart);
 
   const addToWishlist = useStore((state: any) => state.addToWishlist);
   const removeFromWishlist = useStore((state: any) => state.removeFromWishlist);

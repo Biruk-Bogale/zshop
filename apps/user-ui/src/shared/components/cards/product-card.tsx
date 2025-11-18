@@ -24,7 +24,7 @@ const ProductCard = ({
   const deviceInfo = useDeviceTracking();
 
   const addToCart = useStore((state: any) => state.addToCart);
-  const removeFromCart = useStore((state: any) => state.removeFromCart);
+  // const removeFromCart = useStore((state: any) => state.removeFromCart);
 
   const addToWishlist = useStore((state: any) => state.addToWishlist);
   const removeFromWishlist = useStore((state: any) => state.removeFromWishlist);

@@ -41,14 +41,14 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
   );
 
   const [quantity, setQuantity] = useState(1);
-  const [priceRange, setPriceRange] = useState([
-    productDetails?.sales_price,
-    1199,
-  ]);
+  const [
+    priceRange,
+    //  setPriceRange
+  ] = useState([productDetails?.sales_price, 1199]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const addToCart = useStore((state: any) => state.addToCart);
-  const removeFromCart = useStore((state: any) => state.removeFromCart);
+  // const removeFromCart = useStore((state: any) => state.removeFromCart);
   const cart = useStore((state: any) => state.cart);
   const isInCart = cart.some((item: any) => item?.id === productDetails?.id);
   const addToWishlist = useStore((state: any) => state.addToWishlist);
@@ -439,7 +439,7 @@ const ProductDetails = ({ productDetails }: { productDetails: any }) => {
               </div>
 
               <Link
-              onClick={()=>handleChat()}
+                onClick={() => handleChat()}
                 href={"#"}
                 className="text-blue-500 text-sm flex items-center gap-1"
               >

@@ -1,4 +1,3 @@
-import { Param } from "@prisma/client/runtime/library";
 import SellerProfile from "apps/user-ui/src/shared/modules/seller/seller-profile";
 import axiosInstance from "apps/user-ui/src/utils/axiosInstance";
 import { Metadata } from "next";
@@ -14,7 +13,7 @@ async function fetchSellerDetails(id: string) {
 }
 
 // generate metadata generator
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({ params }: { params: { id: string } }):Promise<Metadata> {
   const data = await fetchSellerDetails(params.id);
 
   return {

@@ -12,9 +12,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 const Page = () => {
   const searchParams = useSearchParams();
-  const { user, isLoading: userLoading } = useRequireAuth();
+  const {
+    user,
+    // isLoading: userLoading
+  } = useRequireAuth();
   const router = useRouter();
-  const wsRef = useRef<WebSocket | null>(null);
+  // const wsRef = useRef<WebSocket | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const scrollAnchorRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
