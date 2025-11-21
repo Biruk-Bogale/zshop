@@ -25,9 +25,9 @@ const initialzeSiteConfig = async () => {
               "Wearables",
             ],
           },
-          logo: "https://ik.imagekit.io/siisbrnjd/logo/jahshjjas%hna&andkjksdb",
+          logo: "https://innovatek.co.nz/wp-content/uploads/2024/02/Z-logo-clear-2024-500x250-web.png",
           banner:
-            "https://ik.imagekit.io/siisbrnjd/logo/jahshjjas%hna&andkjksdb",
+            "https://www.orimoproducts.com/storage/main/products/osw-30-600x600.png",
         },
       });
     }

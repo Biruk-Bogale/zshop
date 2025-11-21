@@ -4,6 +4,7 @@ import useRequireAuth from "apps/user-ui/src/hooks/useRequiredAuth";
 import QuickActionCard from "apps/user-ui/src/shared/components/cards/quick-action-card";
 import StatCard from "apps/user-ui/src/shared/components/cards/stat.card";
 import ChangePassword from "apps/user-ui/src/shared/components/change-password";
+import Notifications from "apps/user-ui/src/shared/components/notification/Notification";
 import ShippingAddressSection from "apps/user-ui/src/shared/components/shippingAddress";
 import OrdersTable from "apps/user-ui/src/shared/components/tables/orders-table";
 import axiosInstance from "apps/user-ui/src/utils/axiosInstance";
@@ -210,8 +211,10 @@ const Page = () => {
               <OrdersTable />
             ) : activeTab === "Change Password" ? (
               <ChangePassword />
+            ) : activeTab === "Notification" ? (
+              <Notifications />
             ) : (
-              <> </>
+              <p>Not Found</p>
             )}
           </div>
 

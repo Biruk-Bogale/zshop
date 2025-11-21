@@ -5,6 +5,7 @@ import {
   createStripeConnectLink,
   deleteUserAddress,
   getAdmin,
+  getLayoutData,
   getSeller,
   getUser,
   getUserAddress,
@@ -40,11 +41,12 @@ router.post("/create-shop", createShop);
 router.post("/create-stripe-link", createStripeConnectLink);
 router.post("/login-seller", loginSeller);
 router.post("/login-admin", loginAdmin);
-router.get("/logged-in-admin",isAuthenticated, getAdmin);
+router.get("/logged-in-admin", isAuthenticated, getAdmin);
 router.get("/logged-in-seller", isAuthenticated, isSeller, getSeller);
 router.get("/shipping-addresses", isAuthenticated, getUserAddress);
 router.post("/add-address", isAuthenticated, addUserAddress);
 router.delete("/delete-address/:addressId", isAuthenticated, deleteUserAddress);
 router.post("/change-password", isAuthenticated, updateUserPassword);
+router.get("/get-layouts", getLayoutData);
 
 export default router;

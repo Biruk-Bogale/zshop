@@ -283,8 +283,8 @@ model notifications {
     message              String
     status               String @default("Unread")
 
-    createdAt            DateTime @default(now())
-    updatedAt            DateTime @updatedAt
+    createdAt            DateTime? @default(now())
+    updatedAt            DateTime? @updatedAt
 }
 
 model conversationGroup {

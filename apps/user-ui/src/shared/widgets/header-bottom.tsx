@@ -54,165 +54,167 @@ const HeaderBottom = () => {
     <div
       className={`w-full transition-all duration-300 ${
         isSticky
-          ? "fixed top-0 left-0 z-[100] bg-white shadow-lg"
-          : "shadow-sm relative"
+          ? "fixed top-0 left-0 z-[100] bg-white shadow-lg py-2"
+          : "shadow-sm relative bg-white border-t border-gray-100"
       }`}
     >
-      <div
-        className={`w-[80%] relative m-auto flex items-center justify-between ${
-          isSticky ? "pt-3" : "py-0"
-        }`}
-      >
+      <div className="max-w-[1400px] w-[90%] m-auto flex items-center justify-between">
         {/* all DropDowns */}
-        <div
-          className={`w-[260px] ${
-            isSticky && "-mb-2"
-          } cursor-pointer flex items-center justify-between px-5 h-[50px] bg-[#ff4d00]`}
-          onClick={() => setShow(!show)}
-        >
-          <div className="flex items-center gap-2">
-            <AlignLeft color="white" />
-            <span className="text-white font-medium">All Departments</span>
+        <div className="relative">
+          <div
+            className={`w-[260px] cursor-pointer flex items-center justify-between px-6 h-[50px] bg-[#ff4d00] rounded-t-xl ${
+              !show && !isSticky ? "rounded-b-xl" : "rounded-b-none"
+            } ${
+              isSticky && "rounded-xl"
+            } transition-all duration-300 hover:bg-[#e04400] shadow-md`}
+            onClick={() => setShow(!show)}
+          >
+            <div className="flex items-center gap-3">
+              <AlignLeft color="white" size={20} />
+              <span className="text-white font-medium text-base">
+                All Departments
+              </span>
+            </div>
+            <ChevronDown
+              color="white"
+              size={20}
+              className={`transition-transform duration-300 ${
+                show ? "rotate-180" : "rotate-0"
+              }`}
+            />
           </div>
-          <ChevronDown color="white" />
+
+          {/* Dropdown menu */}
+          <div
+            className={`absolute left-0 top-[50px] w-[260px] bg-white shadow-xl rounded-b-xl border-x border-b border-gray-100 transition-all duration-300 origin-top z-50 ${
+              show
+                ? "opacity-100 scale-y-100 visible"
+                : "opacity-0 scale-y-0 invisible"
+            }`}
+          >
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+              {data?.categories?.length > 0 ? (
+                data.categories.map((cat: string, i: number) => {
+                  const hasSub = data.subCategories?.[cat]?.length > 0;
+                  const isExpanded = expandedCategory === cat;
+
+                  return (
+                    <div key={i} className="relative group/item">
+                      <button
+                        onClick={() => {
+                          if (hasSub) {
+                            setExpandedCategory((prev) =>
+                              prev === cat ? null : cat
+                            );
+                          } else {
+                            setShow(false);
+                            window.location.href = `/products?category=${expandedCategory}/${encodeURIComponent(
+                              cat
+                            )}`;
+                          }
+                        }}
+                        className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#ff4d00]"
+                      >
+                        <span className="text-sm font-medium">{cat}</span>
+
+                        {hasSub &&
+                          (isExpanded ? (
+                            <ChevronDown className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-gray-400 group-hover/item:text-[#ff4d00]" />
+                          ))}
+                      </button>
+
+                      {/* subCategoris panel */}
+                      {isExpanded && hasSub && (
+                        <div className="bg-gray-50 border-y border-gray-100">
+                          {data?.subCategories[cat].map(
+                            (sub: string, i: number) => (
+                              <Link
+                                key={i}
+                                href={`products?category=${encodeURIComponent(
+                                  cat
+                                )}`}
+                                className="block px-8 py-2 text-sm text-gray-500 hover:text-[#ff4d00] hover:bg-gray-100 transition-colors"
+                                onClick={() => setShow(false)}
+                              >
+                                {sub}
+                              </Link>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="px-5 py-4 text-sm text-gray-500">
+                  No Categories found.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Dropdown menu */}
-        {show && (
-          <div
-            className={`absolute left-0 ${
-              isSticky ? "top-[70px]" : "top-[50px]"
-            } w-[260px] h-[400px] bg-[#f5f5f5]`}
-          >
-            {data?.categories?.length > 0 ? (
-              data.categories.map((cat: string, i: number) => {
-                const hasSub = data.subCategories?.[cat]?.length > 0;
-                const isExpanded = expandedCategory === cat;
-
-                return (
-                  <div key={i} className="relative">
-                    <button
-                      onClick={() => {
-                        if (hasSub) {
-                          setExpandedCategory((prev) =>
-                            prev === cat ? null : cat
-                          );
-                        } else {
-                          setShow(false);
-                          window.location.href = `/products?category=${expandedCategory}/${encodeURIComponent(
-                            cat
-                          )}`;
-                        }
-                      }}
-                      className="w-full flex items-center justify-between"
-                    >
-                      <span>{cat}</span>
-
-                      {hasSub &&
-                        (isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-500" />
-                        ))}
-                    </button>
-
-                    {/* subCategoris panel */}
-                    {isExpanded && hasSub && (
-                      <div className="pl-4 bg-gray-50 border-t border-gray-300">
-                        {data?.subCategories[cat].map(
-                          (sub: string, i: number) => (
-                            <Link
-                              key={i}
-                              href={`products?category=${encodeURIComponent(
-                                cat
-                              )}`}
-                              className="block px-4 py-2 text-sm text-gray-500"
-                              onClick={() => setShow(false)}
-                            >
-                              {sub}
-                            </Link>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <p className="px-5 py-4 text-sm text-gray-500">
-                No Categories found.
-              </p>
-            )}
-          </div>
-        )}
-
         {/* Navigation Links */}
-        <div className="flex items-center">
+        <div className="hidden lg:flex items-center gap-8">
           {navItems.map((item: NavItemsTypes, index: number) => (
             <Link
-              className="px-5 font-medium text-lg"
+              className="font-medium text-gray-700 hover:text-[#ff4d00] transition-colors relative group py-2 text-sm uppercase tracking-wide"
               href={item.href}
               key={index}
             >
               {item.title}
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#ff4d00] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </div>
 
-        <div>
+        {/* Sticky Icons */}
+        <div className="flex items-center">
           {isSticky && (
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
                 {!isLoading && user ? (
-                  <>
-                    <Link
-                      href={"/profile"}
-                      className="border-2 w-[50px] h-[50px] flex items-center justify-center rounded-full  border-[#010f1c1a]"
-                    >
-                      <User />
-                    </Link>
-
-                    <Link href={"/profile"}>
-                      <span className="block font-medium">Hello,</span>
-
-                      <span className="block font-medium">
-                        {user?.name?.split(" ")[0]}
-                      </span>
-                    </Link>
-                  </>
+                  <Link
+                    href={"/profile"}
+                    className="flex items-center gap-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 group-hover:border-[#ff4d00] group-hover:text-[#ff4d00] transition-all">
+                      <User size={20} />
+                    </div>
+                  </Link>
                 ) : (
-                  <>
-                    <Link
-                      href={"/login"}
-                      className="border-2 w-[50px] h-[50px] flex items-center justify-center rounded-full border-[#010f1c1a]"
-                    >
-                      <User />
-                    </Link>
-                    <Link href={"/login"}>
-                      <span className="block font-medium">Hello,</span>
-
-                      <span className="block font-medium">
-                        {isLoading ? "..." : "Sign In"}
-                      </span>
-                    </Link>
-                  </>
+                  <Link
+                    href={"/login"}
+                    className="flex items-center gap-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 group-hover:border-[#ff4d00] group-hover:text-[#ff4d00] transition-all">
+                      <User size={20} />
+                    </div>
+                  </Link>
                 )}
               </div>
-              <div className="flex items-center gap-5">
-                <Link href={"/wishlist"} className="relative">
-                  <HeartIcon />
-                  <div className="w-6 h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute top-[-10px] right-[-10px]">
-                    <span className="text-white font-medium text-sm">
-                      {wishlist?.length}
+
+              <div className="flex items-center gap-4">
+                <Link href={"/wishlist"} className="relative group">
+                  <div className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <HeartIcon className="w-6 h-6 text-gray-600 group-hover:text-[#ff4d00] transition-colors" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff4d00] rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                    <span className="text-white font-bold text-[10px]">
+                      {wishlist?.length || 0}
                     </span>
                   </div>
                 </Link>
 
-                <Link href={"/cart"} className="relative">
-                  <ShoppingCart />
-                  <div className="w-6 h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute top-[-10px] right-[-10px]">
-                    <span className="text-white font-medium text-sm">
-                      {cart?.length}
+                <Link href={"/cart"} className="relative group">
+                  <div className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <ShoppingCart className="w-6 h-6 text-gray-600 group-hover:text-[#ff4d00] transition-colors" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff4d00] rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                    <span className="text-white font-bold text-[10px]">
+                      {cart?.length || 0}
                     </span>
                   </div>
                 </Link>

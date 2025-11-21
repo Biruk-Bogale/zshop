@@ -7,7 +7,6 @@ import useDeviceTracking from "apps/user-ui/src/hooks/useDeviceTracking";
 import useLocationTracking from "apps/user-ui/src/hooks/useLocationTracking";
 import useUser from "apps/user-ui/src/hooks/useUser";
 import axiosInstance from "apps/user-ui/src/utils/axiosInstance";
-import axios from "axios";
 import {
   Calendar,
   Clock,
@@ -58,7 +57,7 @@ const SellerProfile = ({
     const fetchFollowStatus = async () => {
       if (!shop?.id) return;
       try {
-        const res = await axios.get(`/seller/api/is-following/${shop?.id}`);
+        const res = await axiosInstance.get(`/seller/api/is-following/${shop?.id}`);
 
         setIsFollowing(res.data.isFollowing !== null);
       } catch (error) {

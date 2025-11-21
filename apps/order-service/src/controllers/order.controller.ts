@@ -276,7 +276,7 @@ export const createOrder = async (
         }
 
         // create order
-        await prisma.orders.create({
+        const order = await prisma.orders.create({
           data: {
             userId,
             shopId,
@@ -366,7 +366,7 @@ export const createOrder = async (
             totalAmount: coupon?.discountAmount
               ? totalAmount - coupon?.discountAmount
               : totalAmount,
-            trackingUrl: `http://localhost:3000/orders/${sessionId}`,
+            trackingUrl: `http://localhost:3002/orders/${order.id}`,
           }
         );
 
@@ -392,7 +392,7 @@ export const createOrder = async (
               message: `A customer just ordered ${productTitle} from your shop`,
               creatorId: userId,
               receiverId: shop.sellerId,
-              redirect_link: `http://localhost:3000/order/${sessionId}`,
+              redirect_link: `/order/${order.id}`,
             },
           });
         }
@@ -404,7 +404,7 @@ export const createOrder = async (
             message: `A new order was placed by ${name}`,
             creatorId: userId,
             receiverId: "admin",
-            redirect_link: `http://localhost:3000/order/${sessionId}`,
+            redirect_link: `/order/${order.id}`,
           },
         });
 

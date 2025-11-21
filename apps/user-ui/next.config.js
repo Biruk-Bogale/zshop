@@ -23,6 +23,12 @@ const nextConfig = {
       {
         hostname: "fairpay3.birukdev.com",
       },
+      {
+        hostname: "www.orimoproducts.com",
+      },
+      {
+        hostname: "innovatek.co.nz",
+      },
     ],
   },
 };

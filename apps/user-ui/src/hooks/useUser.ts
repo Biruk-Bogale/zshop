@@ -18,7 +18,7 @@ const useUser = () => {
 
   const {
     data: user,
-    isPending,
+    isLoading,
     isError,
     isSuccess,
   } = useQuery({
@@ -27,13 +27,6 @@ const useUser = () => {
     staleTime: 1000 * 60 * 5,
     retry: false,
     enabled: isLoggedIn !== false,
-    // @ts-ignore
-    // onSuccess: () => {
-    //   setLoggedIn(true);
-    // },
-    // onError: () => {
-    //   setLoggedIn(false);
-    // },
   });
 
   useEffect(() => {
@@ -45,7 +38,7 @@ const useUser = () => {
     }
   }, [isSuccess, isError]);
 
-  return { user: user as any, isLoading: isPending, isError };
+  return { user: user as any, isLoading, isError };
 };
 
 export default useUser;

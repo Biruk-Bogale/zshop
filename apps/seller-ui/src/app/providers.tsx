@@ -22,7 +22,9 @@ const ProvidersWithWebSocket = ({
 }) => {
   const { seller, isLoading } = useSeller();
 
-  if (isLoading) return "loading....";
+  console.log(isLoading);
+
+  if (isLoading) return "loading....s";
 
   return (
     <>
