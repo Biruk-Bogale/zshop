@@ -1,6 +1,6 @@
 import prisma from "@packages/libs/primsa";
 
-export const fetchUserActivity = async (userId: string) => {
+export const getUserActivity = async (userId: string) => {
   try {
     const userActivity = await prisma.userAnalytics.findUnique({
       where: { userId },

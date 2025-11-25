@@ -1,5 +1,5 @@
 import * as tf from "@tensorflow/tfjs-node";
-import { fetchUserActivity } from "./fetch-user-activity.service";
+import { getUserActivity } from "./fetch-user-activity.service";
 import { preProcessData } from "../utils/preProcessData";
 
 const EMBEDDING_DIM = 50;
@@ -16,13 +16,13 @@ interface Interaction {
   actionType: UserAction["actionType"];
 }
 
-interface Interaction {
+interface RecommendedProduct {
   productId: string;
   score: number;
 }
 
-async function fetchUserActvity(userId: string): Promise<UserAction[]> {
-  const userActions = await fetchUserActvity(userId);
+async function fetchUserActivity(userId: string): Promise<UserAction[]> {
+  const userActions = await getUserActivity(userId);
   return Array.isArray(userActions)
     ? (userActions as unknown as UserAction[])
     : [];
@@ -32,7 +32,7 @@ export const recommendProducts = async (
   userId: string,
   allProducts: any
 ): Promise<string[]> => {
-  const userActions: UserAction[] = await fetchUserActvity(userId);
+  const userActions: UserAction[] = await fetchUserActivity(userId);
 
   if (userActions.length === 0) {
     return [];
@@ -48,5 +48,125 @@ export const recommendProducts = async (
     interactions: Interaction[];
   };
 
-  return interactions.map((interaction) => interaction.productId);
+  const userMap: Record<string, number> = {};
+  const productMap: Record<string, number> = {};
+
+  let userCount = 0;
+  let productCount = 0;
+
+  interactions.forEach(({ userId, productId }) => {
+    if (!(userId in userMap)) userMap[userId] = userCount++;
+    if (!(productId in productMap)) productMap[productId] = productCount++;
+  });
+
+  //   define model input layer
+  const userInput = tf.input({
+    shape: [1],
+    dtype: "int32",
+  }) as tf.SymbolicTensor;
+
+  const productInput = tf.input({
+    shape: [1],
+    dtype: "int32",
+  }) as tf.SymbolicTensor;
+
+  //   create embedding layer (like lookup tables) to learn the relationship
+  const userEmbedding = tf.layers
+    .embedding({
+      inputDim: userCount,
+      outputDim: EMBEDDING_DIM,
+    })
+    .apply(userInput) as tf.SymbolicTensor;
+
+  const productEmbedding = tf.layers
+    .embedding({
+      inputDim: productCount,
+      outputDim: EMBEDDING_DIM,
+    })
+    .apply(productInput) as tf.SymbolicTensor;
+
+  // flatten the 2D embeddings into 1D feature vectors
+  const userVectors = tf.layers
+    .flatten()
+    .apply(userEmbedding) as tf.SymbolicTensor;
+  const productVectors = tf.layers
+    .flatten()
+    .apply(productEmbedding) as tf.SymbolicTensor;
+
+  // Dot product combines user and product vectors (user-product affinity)
+  const merged = tf.layers
+    .dot({ axes: 1 })
+    .apply([userVectors, productVectors]) as tf.SymbolicTensor;
+
+  // final layer: outputs probabilty of interaction
+  const output = tf.layers
+    .dense({ units: 1, activation: "sigmoid" })
+    .apply(merged) as tf.SymbolicTensor;
+
+  // compile the recomendation model
+  const model = tf.model({
+    inputs: [userInput, productInput],
+    outputs: output,
+  });
+
+  model.compile({
+    optimizer: tf.train.adam(),
+    loss: "binaryCrossentropy",
+    metrics: ["accuracy"],
+  });
+
+  //   convert user and product interactions into tensor for training
+  const userTensor = tf.tensor1d(
+    interactions.map((d) => userMap[d.userId] ?? 0),
+    "int32"
+  );
+
+  const productTensor = tf.tensor1d(
+    interactions.map((d) => productMap[d.productId] ?? 0),
+    "int32"
+  );
+
+  const weightLabels = tf.tensor2d(
+    interactions.map((d) => {
+      switch (d.actionType) {
+        case "purchase":
+          return [1.0];
+        case "add_to_cart":
+          return [0.7];
+        case "add_to_wishlist":
+          return [0.5];
+        case "product_view":
+          return [0.1];
+
+        default:
+          return [0];
+      }
+    }),
+    [interactions.length, 1]
+  );
+
+  await model.fit([userTensor, productTensor], weightLabels, {
+    epochs: 5,
+    batchSize: 32,
+  });
+
+  const productTensorAll = tf.tensor1d(Object.values(productMap), "int32");
+
+  const predictions = model.predict([
+    tf.tensor1d([userMap[userId] ?? 0], "int32"),
+    productTensorAll,
+  ]) as tf.Tensor;
+
+  const scores = (await predictions.array()) as number[];
+
+  //   sort and select top 10 recommeded product based on score
+  const recommendedProducts: RecommendedProduct[] = Object.keys(productMap)
+    .map((productId, index) => ({
+      productId,
+      score: scores[index] ?? 0,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+  return recommendedProducts.map((p) => p.productId);
 };
