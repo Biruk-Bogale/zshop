@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 // routes
-app.use("/api", require("./routes/recommendation"));
+app.use("/api", require("./routes/recommendation.routes"));
 
 const port = process.env.PORT || 6007;
 const server = app.listen(port, () => {
