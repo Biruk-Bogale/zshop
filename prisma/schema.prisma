@@ -68,7 +68,7 @@ model shops {
   bio                     String?
   category                String
   avatar                  String?
-  imagesId                String?  @db.ObjectId @unique
+  imagesId                String?  @db.ObjectId
   coverBanner             String?
   address                 String
   opening_hours           String

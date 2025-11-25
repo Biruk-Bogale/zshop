@@ -42,7 +42,10 @@ const Header = () => {
         <div className="shrink-0">
           <Link href={"/"} className="flex items-center gap-1">
             <Image
-              src={layout?.logo}
+              src={
+                layout?.logo ||
+                "https://ik.imagekit.io/universityLibrary/products/product-1752739178716_P4vrl_hXs.jpg?tr=e-upscale"
+              }
               alt=""
               width={300}
               height={100}

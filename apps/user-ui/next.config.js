@@ -29,6 +29,9 @@ const nextConfig = {
       {
         hostname: "innovatek.co.nz",
       },
+      {
+        hostname: "example.com",
+      },
     ],
   },
 };
